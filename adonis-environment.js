@@ -4,6 +4,11 @@
 const { Ignitor } = require('@adonisjs/core/build/standalone');
 const { register } = require('@adonisjs/require-ts');
 const NodeEnvironment = require('jest-environment-node');
+// puppeteer
+const PuppeteerEnvironment = require('jest-environment-puppeteer')
+
+const puppeteerEnvironment = new PuppeteerEnvironment()
+// end:puppeteer
 
 const iocSymbol = Symbol.for('ioc.use');
 
@@ -58,12 +63,21 @@ class AdonisEnvironment extends NodeEnvironment {
       console.error(e);
       process.exit(1);
     }
+
+    // puppeteer
+    await puppeteerEnvironment.setup()
+    // end:puppeteer
   }
 
   async teardown() {
     await app.shutdown();
     app.isShuttingDown = false;
     app.state = 'booted';
+
+    // puppeteer
+    await puppeteerEnvironment.teardown()
+    // end:puppeteer
+
     await super.teardown();
   }
 }
